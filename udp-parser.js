@@ -96,7 +96,10 @@ class PCars2UdpParser extends events.EventEmitter{
         if(base.mPacketVersion === 2){
             const structName = this.packetIdToStruct[base.mPacketType];
             const parsed = this.parseType(buffer,structName);
-            console.log(JSON.stringify(parsed));
+            
+            if(structName === 'sTelemetryData'){
+                console.log(parsed);
+            }
         }
     }
 

@@ -34,8 +34,12 @@ class ParseableVariable{
             return parser.string(this.varName,{encoding:'utf8',length:this.arraySize[0]});
         }
 
-        if(this.varType === 'char' && this.arraySize.length > 1){
-            return this.getArrayParser(parser,this.arraySize.slice(0,-1),new Parser().string('',{encoding:'utf8',length:this.arraySize[this.arraySize.length-1]}));
+        if(this.varType === 'char' && this.arraySize.length == 2){
+            return parser.array(this.varName
+                ,{
+                    type:new Parser().string('',{encoding:'utf8',length:this.arraySize[1]}),
+                    length:this.arraySize[0]
+                });
         }
 
         //e.g. unsigned int
@@ -43,19 +47,37 @@ class ParseableVariable{
             return typesDict[this.varType].call(parser,this.varName);
         }
 
+        if(typesDict[this.varType] && this.arraySize.length === 1){
+            return parser.array(this.varName,{
+                type:typesDict[this.varType].call(new Parser(),''),
+                length:this.arraySize[0]
+            });
+        }
         
         
         //e.g. sBase
         if(this.arraySize.length === 0){
             return parser.nest(this.varName,{type:otherStructs[this.varType].getParser(otherStructs)});
-            
         }
+
+        if(this.arraySize.length === 1){
+            return parser.array(this.varName,
+                {
+                    type:otherStructs[this.varType].getParser(otherStructs),
+                    length:this.arraySize[0]
+                });
+        }
+
+
+
 
         //handle array types here
         const baseParser = typesDict[this.varType] != undefined ?
              typesDict[this.varType].call(new Parser(),'') :
               otherStructs[this.varType].getParser(otherStructs);
         return this.getArrayParser(parser,this.arraySize,baseParser);
+
+        throw new Error("Variable could not be parsed");
         
     };
 
