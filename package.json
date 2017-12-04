@@ -1,0 +1,21 @@
+{
+  "name": "pcars2-udp",
+  "version": "1.3.0",
+  "description": "A small library for receiving Project Cars 2 UDP data and parsing it into JS objects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "listener":"node index.js"
+  },
+  "keywords": [
+    "games",
+    "project",
+    "cars",
+    "pcars",
+    "2",
+    "sms",
+    "telemetry"
+  ],
+  "author": "Jonas Körner",
+  "license": "ISC"
+}
