@@ -125,7 +125,13 @@ struct sTelemetryData
 	unsigned int							sJoyPad0;													// 376 4
 	unsigned char							sDPad;														// 377 1
 	char									sTyreCompound[4][TYRE_NAME_LENGTH_MAX]; // 378 160
-};																									// 538	
+
+
+	float	sTurboBoostPressure;	// 538 4
+	float	sFullPosition[3];	// 542 12 -- position of the viewed participant with full precision
+	unsigned char	sBrakeBias;	// 554 1 -- quantized brake bias
+
+};																									// 555	
 #pragma pack(pop)
 
 #define PARTICIPANT_NAME_LENGTH_MAX										64
@@ -180,6 +186,8 @@ struct sParticipantsData
 	PacketBase					sBase;				
 	unsigned int				sParticipantsChangedTimestamp;
 	char						sName[PARTICIPANTS_PER_PACKET][PARTICIPANT_NAME_LENGTH_MAX];
+	unsigned int	sNationality[PARTICIPANTS_PER_PACKET];	//	1040 64 
+	unsigned short	sIndex[PARTICIPANTS_PER_PACKET];	// 1104 32 -- session unique index for MP races
 };
 
 /*******************************************************************************************************************
@@ -207,6 +215,8 @@ struct sParticipantInfo
 	unsigned char							sCurrentLap;									// 21 -- 
 	float									sCurrentTime;									// 22 --
 	float									sCurrentSectorTime;								// 26 --
+
+	unsigned short	sMPParticipantIndex;	// 30 -- matching sIndex from sParticipantsData
 };																							// 30
 
 struct sTimingsData
@@ -220,6 +230,8 @@ struct sTimingsData
 	float							sSplitTimeBehind;										// 25 -- 
 	float							sSplitTime;												// 29 --
 	sParticipantInfo				sPartcipants[UDP_STREAMER_PARTICIPANTS_SUPPORTED];		// 33 960
+
+	unsigned short	sLocalParticipantIndex;	// 1057 -- identifies which of the MP participants is the local player
 };																							// 993
 #pragma pack(pop)	
 
@@ -267,6 +279,9 @@ struct sParticipantStatsInfo
 	float							sFastestSector1Time;							// 11
 	float							sFastestSector2Time;							// 16
 	float							sFastestSector3Time;							// 20
+
+	unsigned int	sParticipantOnlineRep;	// 24 (u16 rank type + u16 strength, 0 in SP races)
+	unsigned short	sMPParticipantIndex;	// 28 -- matching sIndex from sParticipantsData
 };																					// 24
 
 struct sParticipantsStats

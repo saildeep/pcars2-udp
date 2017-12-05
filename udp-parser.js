@@ -83,9 +83,11 @@ class PCars2UdpParser extends events.EventEmitter{
             const struct = allStructsDict[structName];
             if(struct.packetSize > 0){
                 this.packetSizeToStruct[struct.packetSize] = struct;
-            }
+                struct.getParser(allStructsDict);
+                            }
         }
 
+        
         this.packetIdToStruct = ['sTelemetryData','sRaceData','sParticipantsData','sTimingsData','sGameStateData','','','sTimeStatsData','sParticipantVehicleNamesData'];
         
         
@@ -98,7 +100,8 @@ class PCars2UdpParser extends events.EventEmitter{
             const parsed = this.parseType(buffer,structName);
             
             if(structName === 'sTelemetryData'){
-                console.log(parsed);
+              console.log(parsed);
+               //console.log(buffer.length)
             }
         }
     }

@@ -3,18 +3,17 @@ const Parser = require('binary-parser').Parser;
 
 const typesDict={
 
-'signed char': Parser.prototype.int8,
-'unsigned char': Parser.prototype.uint8,
-'char': Parser.prototype.uint8,
+'signed char': (parser,name) => {return parser.int8(name)},
+'unsigned char': (parser,name) => {return parser.uint8(name)},
+'char': (parser,name) => {return parser.int8(name)},
 
-'signed short': Parser.prototype.int16,
-'unsigned short': Parser.prototype.uint16,
+'signed short': (parser,name) => {return parser.int16le(name)},
+'unsigned short': (parser,name) => {return parser.uint16le(name)},
 
-'signed int': Parser.prototype.int32,
-'unsigned int': Parser.prototype.uint32,
+'signed int': (parser,name) => {return parser.int32le(name)},
+'unsigned int': (parser,name) => {return parser.uint32le(name)},
 
-'float': Parser.prototype.float,
-'double':Parser.prototype.double,
+'float': (parser,name) => {return parser.floatle(name)},
 
 };
 class ParseableVariable{
@@ -44,12 +43,12 @@ class ParseableVariable{
 
         //e.g. unsigned int
         if(typesDict[this.varType] && this.arraySize.length === 0){
-            return typesDict[this.varType].call(parser,this.varName);
+            return typesDict[this.varType].call(null,parser,this.varName);
         }
 
         if(typesDict[this.varType] && this.arraySize.length === 1){
             return parser.array(this.varName,{
-                type:typesDict[this.varType].call(new Parser(),''),
+                type:typesDict[this.varType](new Parser().endianess('little'),''),
                 length:this.arraySize[0]
             });
         }
@@ -57,13 +56,13 @@ class ParseableVariable{
         
         //e.g. sBase
         if(this.arraySize.length === 0){
-            return parser.nest(this.varName,{type:otherStructs[this.varType].getParser(otherStructs)});
+            return parser.nest(this.varName,{type:otherStructs[this.varType].getParser(otherStructs,true)});
         }
 
         if(this.arraySize.length === 1){
             return parser.array(this.varName,
                 {
-                    type:otherStructs[this.varType].getParser(otherStructs),
+                    type:otherStructs[this.varType].getParser(otherStructs,true),
                     length:this.arraySize[0]
                 });
         }
@@ -71,22 +70,10 @@ class ParseableVariable{
 
 
 
-        //handle array types here
-        const baseParser = typesDict[this.varType] != undefined ?
-             typesDict[this.varType].call(new Parser(),'') :
-              otherStructs[this.varType].getParser(otherStructs);
-        return this.getArrayParser(parser,this.arraySize,baseParser);
-
         throw new Error("Variable could not be parsed");
         
     };
 
-    getArrayParser(parser,depths,elementParser){
-        return parser.array(depths.length == this.arraySize ? this.varName : '',{
-            type:depths.length === 1 ? elementParser: this.getArrayParser(new Parser(),depths.slice(1),elementParser),
-            length:depths[0]
-        });
-    }
 }
 
 module.exports = exports = ParseableVariable;

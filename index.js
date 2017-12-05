@@ -5,7 +5,7 @@ const dgram = require('dgram');
 
 const socket = dgram.createSocket('udp4');
 socket.on('message',(msg,info) =>{
-    
+    console.log(msg.length);
     parser.pushBuffer(msg);
 });
 
