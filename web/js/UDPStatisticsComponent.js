@@ -8,7 +8,6 @@ class UDPStatisticsComponent extends BaseComponent{
     }
 
     OnReset(){
-        this.svg = this.div.append('svg').attr('height',this.height()).attr('width',this.width());
         this.svg.append('text').attr('x',10).attr('y',this.height() / 8).html('Loss Rate');
         this.svg.append('text').attr('x',10 + this.width() / 2).attr('y',this.height() / 8).html('Data Interval');
 
@@ -18,7 +17,6 @@ class UDPStatisticsComponent extends BaseComponent{
 
 
     update(data){
-        console.log(data);
 
         const interval = data.sTelemetryData.smoothInterval;
         const skipRate = data.sTelemetryData.smoothSkipRatio;
