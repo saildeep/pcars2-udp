@@ -25,3 +25,12 @@ window.onload = function(){
     components.push(new GearComponent(socket,d3.select('#gear')));
     
 }
+
+
+
+
+socket.on('sTelemetryData_raw',(data) =>{
+    if( (data.sDPad & 1) > 0){
+        resetAll();
+    }
+})
