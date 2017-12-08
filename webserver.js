@@ -34,6 +34,10 @@ parser.on('sTelemetryData_raw',(data)=>{
     io.sockets.emit('sTelemetryData_raw',data);
 });
 
+parser.on('statistics',(data)=>{
+    io.sockets.emit('statistics',data);
+});
+
 
 http.listen(3000, function(){
     console.log('listening on *:3000');
