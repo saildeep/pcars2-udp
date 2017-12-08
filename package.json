@@ -2,8 +2,9 @@
   "name": "pcars2-udp",
   "version": "1.3.0",
   "description": "A small library for receiving Project Cars 2 UDP data and parsing it into JS objects",
-  "main": "index.js",
+  "main": "webserver.js",
   "scripts": {
+    "start":"node webserver.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "listener": "node index.js",
     "capture": "node capture.js",
