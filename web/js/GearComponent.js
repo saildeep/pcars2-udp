@@ -19,7 +19,7 @@ class GearComponent extends BaseComponent{
 
     update(data){
         const gear = data.sGearNumGears & 0xF;
-        var gearString = "-1";
+        var gearString = "R";
         if(gear === 0){
             gearString = "N";
         }else if(gear < 15){
