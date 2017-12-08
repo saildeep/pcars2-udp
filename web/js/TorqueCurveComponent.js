@@ -19,7 +19,21 @@ class TorqueCurceComponent extends BaseComponent{
 
         this.maxTorque = 50;
         this.maxPower = 50;
+
+        this.maxTorqueText = this.svg.append('text').attr('x',0.01 * this.width()).attr('fill','red');
+        this.maxTorqueLine = this.svg.append('line')
+        .attr('x1',this.width() * 0.1)
+        .attr('x2',this.width()*0.9)
+        .attr('stroke','red');
         
+        this.maxPowerText = this.svg.append('text').attr('x',0.9 * this.width()).attr('fill','blue');
+        this.maxPowerLine = this.svg.append('line')
+        .attr('x1',this.width() * 0.1)
+        .attr('x2',this.width()*0.9)
+        .attr('stroke','blue');
+       
+
+
         this.lastMaxRpm;
     }
 
@@ -113,6 +127,17 @@ class TorqueCurceComponent extends BaseComponent{
         .attr('y',(d,i) => {return i%2 == 0 ? 0.95 *  this.height(): 0.05 * this.height();})
         .attr('text-anchor','middle')
         .html((d)=>{return d + 'rpm'} );
+
+
+        const torqueY = 0.1* this.height() + this.height() * this.maxTorque/maxAxis * 0.8;
+
+        this.maxTorqueText.attr('y',torqueY).html(this.maxTorque.toFixed(0) + "NM");
+        this.maxTorqueLine.attr('y1',torqueY).attr('y2',torqueY);
+
+
+        const powerY = 0.1 * this.height() + this.height() * this.maxPower / maxAxis * 0.8;
+        this.maxPowerText.attr('y',powerY).html(powerY.toFixed(0)+ "HP");
+        this.maxPowerLine.attr('y1',powerY).attr('y2',powerY);
         
     }
 
