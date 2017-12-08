@@ -16,24 +16,20 @@ module.exports = {
   },
   plugins: 
     [
-
-    ] + 
-  debug ? [] : [
+        new ExtractTextPlugin('style.css', {
+            allChunks: true
+        })
+    ], /*+ 
+  (debug ? [] : [
     new webpack.optimize.DedupePlugin(),
     new webpack.optimize.OccurenceOrderPlugin(),
     new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
-  ],
+  ]),*/
 
   module: {
     loaders: [
-      {
-        test: /\.js$/,
-        include: __dirname+ '/js',
-        loader: 'babel-loader',
-        query: {
-          presets: ["es2015"],  
-        }
-      },
+      {test: /\.js$/, include: __dirname+ '/js',loader: 'babel-loader', query: {presets: ["es2015"],}},
+      { test: /\.less$/, exclude: /node_modules/, loader: ExtractTextPlugin.extract("css-loader!less-loader") }
 
       
     ]

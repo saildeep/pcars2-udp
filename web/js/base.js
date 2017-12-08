@@ -1,5 +1,5 @@
 console.log("Starting websocket listener");
-
+let stylesheet = require('../stylesheet/style.less');
 var socket = io();
 var svgContainer = d3.select("#d3").append("svg")                                  
 .attr("width", window.innerWidth)
