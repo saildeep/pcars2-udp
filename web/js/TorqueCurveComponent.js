@@ -136,7 +136,7 @@ class TorqueCurceComponent extends BaseComponent{
 
 
         const powerY = 0.1 * this.height() + this.height() * this.maxPower / maxAxis * 0.8;
-        this.maxPowerText.attr('y',powerY).html(powerY.toFixed(0)+ "HP");
+        this.maxPowerText.attr('y',powerY).html(this.maxPower.toFixed(0)+ "HP");
         this.maxPowerLine.attr('y1',powerY).attr('y2',powerY);
         
     }
