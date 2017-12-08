@@ -2,6 +2,7 @@ const events = require('events');
 const fs = require('fs');
 const ParseableVariable = require('./parseable-variable.js');
 const Struct = require('./struct.js');
+const PacketCategoryStatistics = require('./packet-category-statistics.js');
 
 class PCars2UdpParser extends events.EventEmitter{
     constructor(definitionsFile){
@@ -78,32 +79,42 @@ class PCars2UdpParser extends events.EventEmitter{
         this.allStructsDict = allStructsDict;
 
         this.packetSizeToStruct = {};
+        this.categoryStatistics = {};
         
+
         for(let structName in allStructsDict){
             const struct = allStructsDict[structName];
             if(struct.packetSize > 0){
                 this.packetSizeToStruct[struct.packetSize] = struct;
                 struct.getParser(allStructsDict);
-                            }
+                this.categoryStatistics[structName] = new PacketCategoryStatistics(structName);
+            }
         }
 
         
         this.packetIdToStruct = ['sTelemetryData','sRaceData','sParticipantsData','sTimingsData','sGameStateData','','','sTimeStatsData','sParticipantVehicleNamesData'];
         
-        
+        setInterval(this.sendStatistics.bind(this),1000);
     };
 
     pushBuffer(buffer){
         const base = this.parseBase(buffer);
         if(base.mPacketVersion === 2){
             const structName = this.packetIdToStruct[base.mPacketType];
+            this.categoryStatistics[structName].push(base.mCategoryPacketNumber);
+            //this.emit('statistics',this.categoryStatistics);
             const parsed = this.parseType(buffer,structName);
-            
+            this.emit(structName+ '_raw',parsed);
+
             if(structName === 'sTelemetryData'){
-              console.log(parsed);
+              //console.log(parsed);
                //console.log(buffer.length)
             }
         }
+    }
+
+    sendStatistics(){
+        this.emit('statistics',this.categoryStatistics);
     }
 
     parseBase(buffer){

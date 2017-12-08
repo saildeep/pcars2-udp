@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "listener":"node index.js"
+    "listener": "node index.js",
+    "capture": "node capture.js",
+    "sampledata": "node sampledata.js"
   },
   "keywords": [
     "games",
@@ -17,5 +19,16 @@
     "telemetry"
   ],
   "author": "Jonas Körner",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "autoprefixer-loader": "^3.2.0",
+    "css-loader": "^0.28.7",
+    "express": "^4.16.2",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "less-loader": "^4.0.5",
+    "socket.io": "^2.0.4",
+    "style-loader": "^0.19.0",
+    "webpack": "^3.10.0",
+    "webpack-express-middleware": "^1.2.1"
+  }
 }
