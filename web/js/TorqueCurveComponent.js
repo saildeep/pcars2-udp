@@ -13,10 +13,14 @@ class TorqueCurceComponent extends BaseComponent{
         this.rpminterval = 100;
         this.samplesTorque = this.svg.append('g');
         this.samplesPower = this.svg.append('g');
+        this.xAxisLines = this.svg.append('g');
+        this.xAxisTexts = this.svg.append('g');
+        this.xAxisInterval = 1000;
 
         this.maxTorque = 50;
         this.maxPower = 50;
         
+        this.lastMaxRpm;
     }
 
     update(data){
@@ -54,6 +58,7 @@ class TorqueCurceComponent extends BaseComponent{
         this.maxTorque = Math.max(this.maxTorque,t);
         this.maxPower = Math.max(this.maxPower,p);
 
+        const maxAxis = Math.max(this.maxTorque,this.maxPower);
 
         this.samplesTorque
         .selectAll('circle')
@@ -66,7 +71,7 @@ class TorqueCurceComponent extends BaseComponent{
 
         this.samplesTorque.selectAll('circle')
         .attr('cx',(d,i)=>{return 0.1 * this.width() + i * this.rpminterval * this.width() * 0.8 / data.sMaxRpm })
-        .attr('cy',(d,i)=>{return 0.1 * this.height() + d * 0.8 * this.height() / this.maxTorque });
+        .attr('cy',(d,i)=>{return 0.1 * this.height() + d * 0.8 * this.height() / maxAxis });
 
 
         this.samplesPower
@@ -80,8 +85,35 @@ class TorqueCurceComponent extends BaseComponent{
 
         this.samplesPower.selectAll('circle')
         .attr('cx',(d,i)=>{return 0.1 * this.width() + i * this.rpminterval * this.width() * 0.8 / data.sMaxRpm })
-        .attr('cy',(d,i)=>{return 0.1 * this.height() + d * 0.8 * this.height() / this.maxPower });
+        .attr('cy',(d,i)=>{return 0.1 * this.height() + d * 0.8 * this.height() / maxAxis });
 
+        
+        var xValues = [];
+        for(var i = 0;i<= data.sMaxRpm;i+=this.xAxisInterval){
+            xValues.push(i);
+        }
+
+        this.xAxisLines
+        .selectAll('line')
+        .data(xValues)
+        .enter()
+        .append('line')
+        .attr('y2',0.1 * this.height())
+        .attr('y1',0.9 * this.height())
+        .attr('stroke','lightgray')
+        .attr('x2',(d,i)=>{return 0.1 * this.width() + d * this.width() * 0.8 / data.sMaxRpm } )
+        .attr('x1',(d,i)=>{return 0.1 * this.width() + d * this.width() * 0.8 / data.sMaxRpm } );
+        
+        this.xAxisTexts
+        .selectAll('text')
+        .data(xValues)
+        .enter()
+        .append('text')
+        .attr('x',(d,i)=>{return 0.1 * this.width() + d * this.width() * 0.8 / data.sMaxRpm })
+        .attr('y',(d,i) => {return i%2 == 0 ? 0.95 *  this.height(): 0.05 * this.height();})
+        .attr('text-anchor','middle')
+        .html((d)=>{return d + 'rpm'} );
+        
     }
 
 }
