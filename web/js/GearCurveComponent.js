@@ -67,7 +67,8 @@ class GearCurveComponent extends BaseComponent{
         }
 
         const accelValue = data.sEngineTorque;
-        
+        //const accelValue = data.sEngineTorque * data.sRpm * (1/60) * 2 * Math.PI * 1e-3 * 1.32;
+
         if(accelValue > this.accelData[accelIndex]){
             this.accelData[accelIndex] = accelValue;
         }
