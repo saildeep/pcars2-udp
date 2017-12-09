@@ -5,6 +5,7 @@ const d3 = require('d3');
 const UDPStatisticsComponent = require('./UDPStatisticsComponent.js');
 const ToruqeCurveComponent = require('./TorqueCurveComponent.js');
 const GearComponent = require('./GearComponent.js');
+const GearCurveComponent = require('./GearCurveComponent.js');
 
 var socket = io();
 
@@ -23,7 +24,7 @@ window.onload = function(){
     components.push(new UDPStatisticsComponent(socket,d3.select('#statistics')));
     components.push(new ToruqeCurveComponent(socket,d3.select('#torque')));
     components.push(new GearComponent(socket,d3.select('#gear')));
-    
+    components.push(new GearCurveComponent(socket,d3.select('#gearCurve')));
 }
 
 
