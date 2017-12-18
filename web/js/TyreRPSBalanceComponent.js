@@ -10,12 +10,21 @@ class TyreRPSBalanceComponent extends BaseComponent{
 
     OnReset(){
         this.tyrePositions = [
-            {x:0.1,y:0.1},
-            {x:0.9,y:0.1},
-            {x:0.1,y:0.9},
-            {x:0.9,y:0.9}
+            {x:0.2,y:0.2},
+            {x:0.8,y:0.2},
+            {x:0.2,y:0.8},
+            {x:0.8,y:0.8}
         ];
 
+        this.factors = [0.99,0.97,0.95,0.9,0.8];
+        this.rpsDataset = this.factors.map(function(d){
+            return new SmoothedTyreDataset(d);
+        });
+        this.heightDataset = this.factors.map(function(d){
+            return new SmoothedTyreDataset(d);
+        });
+
+        this.factorOffset = 0.03;
         
         this.contentPoints = this.svg.append('g');
         
@@ -27,11 +36,28 @@ class TyreRPSBalanceComponent extends BaseComponent{
 
     update(data){
         const rps = data.sTyreRPS;
-        let points = [
+        const height = data.sTyreY;
+       
+        this.rpsDataset.forEach(function(d){d.update(rps)});
+        this.heightDataset.forEach(function(d){d.update(height)});
+        let points = [];
 
-         this.getInterpolatedTyrePosition(rps,0,1),
-        this.getInterpolatedTyrePosition(rps,2,3)
-        ];
+        this.rpsDataset.forEach(function(d,i){
+            points.push(this.getInterpolatedTyrePosition(d.getData(),0,1,{x:0,y:(i +1) * this.factorOffset},{color:'red'}));
+            points.push(this.getInterpolatedTyrePosition(d.getData(),2,3,{x:0,y:-(i+1) * this.factorOffset},{color:'red'}));
+            points.push(this.getInterpolatedTyrePosition(d.getData(),0,2,{y:0,x:(i+1) * this.factorOffset},{color:'red'}));
+            points.push(this.getInterpolatedTyrePosition(d.getData(),1,3,{y:0,x:-(i+1) * this.factorOffset},{color:'red'}));
+        }.bind(this));
+        
+        
+        this.heightDataset.forEach(function(d,i){
+            points.push(this.getInterpolatedTyrePosition(d.getData(),0,1,{x:0,y:-(i +1) * this.factorOffset},{color:'blue'}));
+            points.push(this.getInterpolatedTyrePosition(d.getData(),2,3,{x:0,y:(i+1) * this.factorOffset},{color:'blue'}));
+            points.push(this.getInterpolatedTyrePosition(d.getData(),0,2,{y:0,x:-(i+1) * this.factorOffset},{color:'blue'}));
+            points.push(this.getInterpolatedTyrePosition(d.getData(),1,3,{y:0,x:(i+1) * this.factorOffset},{color:'blue'}));
+        }.bind(this));
+        
+        
 
         const w = this.width();
         const h = this.height();
@@ -39,18 +65,20 @@ class TyreRPSBalanceComponent extends BaseComponent{
         this.contentPoints.selectAll('g').data(points).enter().append('g');
         this.contentPoints.selectAll('g').selectAll('line').data(function(d,i){return d.anchors}).enter().append('line');
         this.contentPoints.selectAll('g').selectAll('line')
-        .attr('stroke','red')
-        .attr('fill','red')
+        .attr('stroke','black')
+        .attr('fill','black')
         .attr('x1',function(d,i){return d[0].x * w})
         .attr('y1',function(d,i){return d[0].y * h})
         .attr('x2',function(d,i){return d[1].x * w})
         .attr('y2',function(d,i){return d[1].y * h});
         this.contentPoints.selectAll('g').selectAll('circle').data(function(d,i){return [d]}).enter().append('circle');
         this.contentPoints.selectAll('g').selectAll('circle').attr('cx',function(d,i){return d.x * w}).attr('cy',function(d,i){return d.y * h})
-        .attr('fill','red').attr('r',10);
+        .attr('fill',function(d){return d.additional.color}).attr('r',10);
     }
 
-    getInterpolatedTyrePosition(rps,indexone,indextwo){
+    getInterpolatedTyrePosition(tyreData,indexone,indextwo,offset,additional){
+        const rps = tyreData
+        const oset = offset || {x:0,y:0};
         const arps = rps[indexone];
         const brps = rps[indextwo];
         const ratio = (brps / (arps + brps)) || 0;
@@ -58,14 +86,32 @@ class TyreRPSBalanceComponent extends BaseComponent{
         const a = apos;
         const bpos = this.tyrePositions[indextwo];
         const b = bpos;
-        const p = {x:this.linearInterpolation(a.x,b.x,ratio),y:this.linearInterpolation(a.y,b.y,ratio)}; 
-        return {x:this.linearInterpolation(a.x,b.x,ratio),y:this.linearInterpolation(a.y,b.y,ratio),anchors:[
+        const p = {x:this.linearInterpolation(a.x,b.x,ratio) + oset.x,y:this.linearInterpolation(a.y,b.y,ratio)+oset.y}; 
+        return {x:p.x,y:p.y,additional:additional,anchors:[
             [p,apos],
-            [p,bpos]
+            [p,bpos],
+            
         ]};
     }
 
     
+}
+
+class SmoothedTyreDataset{
+    constructor(smoothingFactor){
+        this.smoothingFactor = smoothingFactor || 0.99;
+        this.data = [0,0,0,0];
+    }
+
+    update(dataArray){
+        for(var i = 0;i<this.data.length;i++){
+            this.data[i] = this.data[i] * this.smoothingFactor + dataArray[i] * (1-this.smoothingFactor);
+        }
+    }
+
+    getData(){
+        return this.data;
+    }
 }
 
 module.exports = exports = TyreRPSBalanceComponent;
