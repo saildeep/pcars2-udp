@@ -11,8 +11,8 @@ class TorqueCurveComponent extends BaseComponent{
     }
 
     OnReset(){
-        this.torque = new ApproximatedMaxCurve(250);
-        this.power = new ApproximatedMaxCurve(250);
+        this.torque = new ApproximatedMaxCurve(100);
+        this.power = new ApproximatedMaxCurve(100);
         this.gears = new GearRatioTracker();
         this.opticalIntersections = 100;
         this.samplesTorque = this.svg.append('g');
@@ -27,6 +27,7 @@ class TorqueCurveComponent extends BaseComponent{
         .attr('stroke','#04080F')
         .attr('x1',0.1*this.width())
         .attr('x2',0.9*this.width())
+        .attr('stroke-width',5)
         this.xAxisInterval = 1000;
 
 
@@ -38,16 +39,17 @@ class TorqueCurveComponent extends BaseComponent{
         .attr('stroke','#6874E8')
         .attr('x1',0.1*this.width())
         .attr('x2',0.9*this.width())
-        this.xAxisInterval = 1000;
+        .attr('stroke-width',3)
 
 
         this.prevGearRpmDisplay = this.currentRpmGroup
         .append('line')
         .attr('y1',0.2*this.height())
         .attr('y2',0.8*this.height())
-        .attr('stroke','#FEC601')
+        .attr('stroke','#4ca522')
         .attr('x1',0.1*this.width())
         .attr('x2',0.9*this.width())
+        .attr('stroke-width',3)
         this.xAxisInterval = 1000;
 
         this.maxTorqueText = this.svg.append('text').attr('x',0.01 * this.width()).attr('fill','red');
