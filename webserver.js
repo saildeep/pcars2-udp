@@ -30,7 +30,7 @@ const webpackMiddleware = createWebpackMiddleware(compiler, webpackConfig);
 webpackMiddleware(app);
 
 parser.on('sTelemetryData_raw',(data)=>{
-    console.log("Sending telemetry data");
+    //console.log("Sending telemetry data");
     io.sockets.emit('sTelemetryData_raw',data);
 });
 
