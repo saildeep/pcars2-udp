@@ -1,5 +1,7 @@
+
 const BaseComponent = require('./BaseComponent');
 const ApproximatedMaxCurve = require('./ApproximatedMaxCurve');
+const GearRatioTracker = require('./GearRatioTracker');
 const d3 = require('d3');
 
 class TorqueCurveComponent extends BaseComponent{
@@ -11,6 +13,7 @@ class TorqueCurveComponent extends BaseComponent{
     OnReset(){
         this.torque = new ApproximatedMaxCurve(250);
         this.power = new ApproximatedMaxCurve(250);
+        this.gears = new GearRatioTracker();
         this.opticalIntersections = 100;
         this.samplesTorque = this.svg.append('g');
         this.samplesPower = this.svg.append('g');
@@ -21,7 +24,28 @@ class TorqueCurveComponent extends BaseComponent{
         .append('line')
         .attr('y1',0.1*this.height())
         .attr('y2',0.9*this.height())
-        .attr('stroke','#879600')
+        .attr('stroke','#04080F')
+        .attr('x1',0.1*this.width())
+        .attr('x2',0.9*this.width())
+        this.xAxisInterval = 1000;
+
+
+
+        this.nextGearRpmDisplay = this.currentRpmGroup
+        .append('line')
+        .attr('y1',0.2*this.height())
+        .attr('y2',0.8*this.height())
+        .attr('stroke','#6874E8')
+        .attr('x1',0.1*this.width())
+        .attr('x2',0.9*this.width())
+        this.xAxisInterval = 1000;
+
+
+        this.prevGearRpmDisplay = this.currentRpmGroup
+        .append('line')
+        .attr('y1',0.2*this.height())
+        .attr('y2',0.8*this.height())
+        .attr('stroke','#FEC601')
         .attr('x1',0.1*this.width())
         .attr('x2',0.9*this.width())
         this.xAxisInterval = 1000;
@@ -46,15 +70,24 @@ class TorqueCurveComponent extends BaseComponent{
     }
 
     updateCurrentStats(data){
-        const gear = data.sGearNumGears & 0xF;
+        const gear = this.gears.update(data);
         const t = data.sEngineTorque;
         const p = t * data.sRpm * (1/60) * 2 * Math.PI * 1e-3 * 1.32;
-        if(data.sRpm > this.torque.getMaxX())
+        if(data.sRpm > this.torque.getMaxX()|| this.torque.getMaxX() < 1)
             return;
 
         const xcoord = 0.1 * this.width() + 0.8 * this.width() * data.sRpm / this.torque.getMaxX();
         this.currentRpmDisplay.attr('x1',xcoord).attr('x2',xcoord);
-                
+        
+        //display for next and previous gear
+        const nextRpm = this.gears.rpmNext(gear,data.sRpm);
+        const xcoordNext = 0.1 * this.width() + 0.8 * this.width() * nextRpm / this.torque.getMaxX();
+        this.nextGearRpmDisplay.attr('x1',xcoordNext).attr('x2',xcoordNext);        
+
+        const prevRpm = Math.min(this.gears.rpmPrevious(gear,data.sRpm),this.torque.getMaxX());
+        const xcoordPrev = 0.1 * this.width() + 0.8 * this.width() * prevRpm / this.torque.getMaxX();
+        this.prevGearRpmDisplay.attr('x1',xcoordPrev).attr('x2',xcoordPrev);        
+
     }
 
     updateCurves(data){
