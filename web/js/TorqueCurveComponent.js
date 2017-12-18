@@ -16,6 +16,14 @@ class TorqueCurveComponent extends BaseComponent{
         this.samplesPower = this.svg.append('g');
         this.xAxisLines = this.svg.append('g');
         this.xAxisTexts = this.svg.append('g');
+        this.currentRpmGroup = this.svg.append('g');
+        this.currentRpmDisplay = this.currentRpmGroup
+        .append('line')
+        .attr('y1',0.1*this.height())
+        .attr('y2',0.9*this.height())
+        .attr('stroke','#879600')
+        .attr('x1',0.1*this.width())
+        .attr('x2',0.9*this.width())
         this.xAxisInterval = 1000;
 
         this.maxTorqueText = this.svg.append('text').attr('x',0.01 * this.width()).attr('fill','red');
@@ -34,6 +42,19 @@ class TorqueCurveComponent extends BaseComponent{
     }
     update(data){
         this.updateCurves(data);
+        this.updateCurrentStats(data);
+    }
+
+    updateCurrentStats(data){
+        const gear = data.sGearNumGears & 0xF;
+        const t = data.sEngineTorque;
+        const p = t * data.sRpm * (1/60) * 2 * Math.PI * 1e-3 * 1.32;
+        if(data.sRpm > this.torque.getMaxX())
+            return;
+
+        const xcoord = 0.1 * this.width() + 0.8 * this.width() * data.sRpm / this.torque.getMaxX();
+        this.currentRpmDisplay.attr('x1',xcoord).attr('x2',xcoord);
+                
     }
 
     updateCurves(data){
@@ -42,8 +63,7 @@ class TorqueCurveComponent extends BaseComponent{
 
         if(data.sThrottle < 250)
             return;
-        const gear = data.sGearNumGears & 0xF;
-
+       
         const t = data.sEngineTorque;
         const p = t * data.sRpm * (1/60) * 2 * Math.PI * 1e-3 * 1.32;
         const pChanged = this.power.update(data.sRpm,p);

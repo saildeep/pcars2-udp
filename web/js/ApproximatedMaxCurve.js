@@ -3,7 +3,7 @@ import { AssertionError } from "assert";
 class ApproximatedMaxCurve{
     constructor(interval,maxX){
         this.interval =  interval;
-        this.weightMax = 0.5;
+        this.weightMax = 0.2;
         this.weightMin = 0.001;
         this.maxY = 0;
         this.maxX = 0;
@@ -37,7 +37,7 @@ class ApproximatedMaxCurve{
             this.maxY = Math.max(this.maxY,this.data[index])
             return true;
         }else{
-            this.data[index] = this.c(this.data[index] * this.weightMin + y * (1-this.weightMin));
+          //  this.data[index] = this.c(this.data[index] * this.weightMin + y * (1-this.weightMin));
             return false;
         }
 
