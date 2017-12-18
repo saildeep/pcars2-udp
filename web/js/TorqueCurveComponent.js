@@ -30,96 +30,108 @@ class TorqueCurveComponent extends BaseComponent{
         .attr('x2',this.width()*0.9)
         .attr('stroke','blue');
        
-
+        this.lastMaxX = 0;
+    }
+    update(data){
+        this.updateCurves(data);
     }
 
-    update(data){
+    updateCurves(data){
         if(data.sClutch > 0)
             return;
 
-        if(data.sThrottle < 128)
+        if(data.sThrottle < 250)
             return;
-        var dirty = false;
         const gear = data.sGearNumGears & 0xF;
 
         const t = data.sEngineTorque;
         const p = t * data.sRpm * (1/60) * 2 * Math.PI * 1e-3 * 1.32;
         const pChanged = this.power.update(data.sRpm,p);
         const tChanged = this.torque.update(data.sRpm,t);
-        dirty = dirty || pChanged || tChanged;
-        if(!dirty)
-            return;
-       
+        const curveDirty =  pChanged || tChanged;
+        const lastMaxXDirty = this.lastMaxX != this.power.getMaxX();
+        
+        
 
         const maxAxis = Math.max(this.power.getMax(),this.torque.getMax());
 
-        this.samplesTorque
-        .selectAll('circle')
-        .data(this.torque.getIntersected(this.opticalIntersections))
-        .enter()
-        .append('circle')
-        .attr('r',5)
-        .attr('stroke','red')
-        .attr('fill','red');
 
-        this.samplesTorque.selectAll('circle')
-        .attr('cx',(d,i)=>{return 0.1 * this.width() + i * this.width() * 0.8 / this.opticalIntersections })
-        .attr('cy',(d,i)=>{return 0.1 * this.height() + d * 0.8 * this.height() / maxAxis });
+        if(curveDirty){
+            this.samplesTorque
+            .selectAll('circle')
+            .data(this.torque.getIntersected(this.opticalIntersections))
+            .enter()
+            .append('circle')
+            .attr('r',5)
+            .attr('stroke','red')
+            .attr('fill','red');
+
+            this.samplesTorque.selectAll('circle')
+            .attr('cx',(d,i)=>{return 0.1 * this.width() + i * this.width() * 0.8 / this.opticalIntersections })
+            .attr('cy',(d,i)=>{return 0.1 * this.height() + d * 0.8 * this.height() / maxAxis });
 
 
-        this.samplesPower
-        .selectAll('circle')
-        .data(this.power.getIntersected(this.opticalIntersections))
-        .enter()
-        .append('circle')
-        .attr('r',5)
-        .attr('stroke','blue')
-        .attr('fill','blue');
+          
+            this.samplesPower
+            .selectAll('circle')
+            .data(this.power.getIntersected(this.opticalIntersections))
+            .enter()
+            .append('circle')
+            .attr('r',5)
+            .attr('stroke','blue')
+            .attr('fill','blue');
 
-        this.samplesPower.selectAll('circle')
-        .attr('cx',(d,i)=>{return 0.1 * this.width() + i  * this.width() * 0.8 / this.opticalIntersections })
-        .attr('cy',(d,i)=>{return 0.1 * this.height() + d * 0.8 * this.height() / maxAxis });
+            this.samplesPower.selectAll('circle')
+            .attr('cx',(d,i)=>{return 0.1 * this.width() + i  * this.width() * 0.8 / this.opticalIntersections })
+            .attr('cy',(d,i)=>{return 0.1 * this.height() + d * 0.8 * this.height() / maxAxis });
 
+
+
+            const torqueY = 0.1* this.height() + this.height() * this.torque.getMax()/maxAxis * 0.8;
+            
+                    this.maxTorqueText.attr('y',torqueY).html(this.torque.getMax().toFixed(0) + "NM");
+                    this.maxTorqueLine.attr('y1',torqueY).attr('y2',torqueY);
+            
+            
+                    const powerY = 0.1 * this.height() + this.height() * this.torque.getMax() / maxAxis * 0.8;
+                    this.maxPowerText.attr('y',powerY).html(this.power.getMax().toFixed(0)+ "HP");
+                    this.maxPowerLine.attr('y1',powerY).attr('y2',powerY);
+                    
+        }
         
-        var xValues = [];
-        for(var i = 0;i<= this.torque.getMaxX();i+=this.xAxisInterval){
-            xValues.push(i);
+        if(lastMaxXDirty){
+            this.lastMaxX = this.power.getMaxX();
+            var xValues = [];
+            for(var i = 0;i<= this.torque.getMaxX();i+=this.xAxisInterval){
+                xValues.push(i);
+            }
+
+            this.xAxisLines
+            .selectAll('line')
+            .data(xValues)
+            .enter()
+            .append('line');
+
+            this.xAxisLines.selectAll('line')
+            .attr('y2',0.1 * this.height())
+            .attr('y1',0.9 * this.height())
+            .attr('stroke','lightgray')
+            .attr('x2',(d,i)=>{return 0.1 * this.width() + d * this.width() * 0.8 / this.torque.getMaxX() } )
+            .attr('x1',(d,i)=>{return 0.1 * this.width() + d * this.width() * 0.8 / this.torque.getMaxX() } );
+            
+            this.xAxisTexts
+            .selectAll('text')
+            .data(xValues)
+            .enter()
+            .append('text');
+            this.xAxisTexts.selectAll('text')
+            .attr('x',(d,i)=>{return 0.1 * this.width() + d * this.width() * 0.8 / this.torque.getMaxX() })
+            .attr('y',(d,i) => {return i%2 == 0 ? 0.95 *  this.height(): 0.05 * this.height();})
+            .attr('text-anchor','middle')
+            .html((d)=>{return d + 'rpm'} );
+
         }
 
-        this.xAxisLines
-        .selectAll('line')
-        .data(xValues)
-        .enter()
-        .append('line');
-
-        this.xAxisLines.selectAll('line')
-        .attr('y2',0.1 * this.height())
-        .attr('y1',0.9 * this.height())
-        .attr('stroke','lightgray')
-        .attr('x2',(d,i)=>{return 0.1 * this.width() + d * this.width() * 0.8 / this.torque.getMaxX() } )
-        .attr('x1',(d,i)=>{return 0.1 * this.width() + d * this.width() * 0.8 / this.torque.getMaxX() } );
-        
-        this.xAxisTexts
-        .selectAll('text')
-        .data(xValues)
-        .enter()
-        .append('text');
-        this.xAxisTexts.selectAll('text')
-        .attr('x',(d,i)=>{return 0.1 * this.width() + d * this.width() * 0.8 / this.torque.getMaxX() })
-        .attr('y',(d,i) => {return i%2 == 0 ? 0.95 *  this.height(): 0.05 * this.height();})
-        .attr('text-anchor','middle')
-        .html((d)=>{return d + 'rpm'} );
-
-
-        const torqueY = 0.1* this.height() + this.height() * this.torque.getMax()/maxAxis * 0.8;
-
-        this.maxTorqueText.attr('y',torqueY).html(this.torque.getMax().toFixed(0) + "NM");
-        this.maxTorqueLine.attr('y1',torqueY).attr('y2',torqueY);
-
-
-        const powerY = 0.1 * this.height() + this.height() * this.torque.getMax() / maxAxis * 0.8;
-        this.maxPowerText.attr('y',powerY).html(this.power.getMax().toFixed(0)+ "HP");
-        this.maxPowerLine.attr('y1',powerY).attr('y2',powerY);
         
     }
 

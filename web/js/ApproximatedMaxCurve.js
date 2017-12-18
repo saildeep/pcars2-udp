@@ -12,11 +12,19 @@ class ApproximatedMaxCurve{
         
     }
 
+    c(x){
+        if(isNaN(x)){
+            throw new Error("Nan detected");
+        }else{
+            return x;
+        }
+    }
+
     update(x,y){
-        if(y<0)
-            return;
-        if(x<0)
-            return;
+        if(isNaN(y) || !isFinite(y) || y<=0)
+            return false;
+        if(isNaN(x) || !isFinite(x) ||x<=0)
+            return false;
         const index = this.getIndex(x);
         //fill up data array until it has sufficient lengt
         while(this.data.length<= index){
@@ -25,11 +33,11 @@ class ApproximatedMaxCurve{
         }
         this.maxX = Math.max(this.maxX,x);
         if(y > this.data[index]){
-            this.data[index] = this.data[index] * (1-this.weightMax) + y * this.weightMax;
+            this.data[index] = this.c(this.data[index] * (1-this.weightMax) + y * this.weightMax);
             this.maxY = Math.max(this.maxY,this.data[index])
             return true;
         }else{
-            this.data[index] = this.data[index] * this.weightMin + y * (1-this.weightMin);
+            this.data[index] = this.c(this.data[index] * this.weightMin + y * (1-this.weightMin));
             return false;
         }
 
@@ -52,23 +60,20 @@ class ApproximatedMaxCurve{
         return this.data[index] * (1-weight) + this.data[nextIndex] * weight;
     }
     getMax(){
-        return this.maxY;
+        return this.c(this.maxY);
     }
     getMaxX(){
-        return this.maxX;
+        return this.c(this.maxX);
     }
 
     getIntersected(numIntersections){
         const intersectionInterval = this.maxX / numIntersections;
         var out = new Array(numIntersections);
         for(var i = 0;i<numIntersections;i++){
-            out[i] = this.getValue(intersectionInterval * i);
-            if(isNaN(out[i])){
-                console.error("Returning NAN:",intersectionInterval,i,this.data);
-            }
+            out[i] = this.c(this.getValue(intersectionInterval * i));
+            
             
         }
-
         
         return out;
     }

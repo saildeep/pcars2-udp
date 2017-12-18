@@ -24,7 +24,7 @@ window.onload = function(){
     components.push(new UDPStatisticsComponent(socket,d3.select('#statistics')));
     components.push(new ToruqeCurveComponent(socket,d3.select('#torque')));
     components.push(new GearComponent(socket,d3.select('#gear')));
-    components.push(new GearCurveComponent(socket,d3.select('#gearCurve')));
+   // components.push(new GearCurveComponent(socket,d3.select('#gearCurve')));
 }
 
 
