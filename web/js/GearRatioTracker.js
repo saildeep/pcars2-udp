@@ -43,6 +43,11 @@ class GearRatioTracker{
 
         return currentRpm * prevRatio /currentRatio;
     }
+
+    rpmTarget(currentGear,currentSpeed){
+        const currentRatio = this.data[currentGear];
+        return currentRatio * currentSpeed;
+    }
     
 
 

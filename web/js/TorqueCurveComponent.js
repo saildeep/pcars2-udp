@@ -78,8 +78,9 @@ class TorqueCurveComponent extends BaseComponent{
         if(data.sRpm > this.torque.getMaxX()|| this.torque.getMaxX() < 1)
             return;
 
-        const xcoord = 0.1 * this.width() + 0.8 * this.width() * data.sRpm / this.torque.getMaxX();
-        this.currentRpmDisplay.attr('x1',xcoord).attr('x2',xcoord);
+        const xcoord1 = 0.1 * this.width() + 0.8 * this.width() * data.sRpm / this.torque.getMaxX();
+        const xcoord2 = 0.1 * this.width() + 0.8 * this.width() * Math.min(this.gears.rpmTarget(gear,data.sSpeed),this.torque.getMaxX() )/ this.torque.getMaxX();
+        this.currentRpmDisplay.attr('x1',xcoord1).attr('x2',xcoord2);
         
         //display for next and previous gear
         const nextRpm = this.gears.rpmNext(gear,data.sRpm);
