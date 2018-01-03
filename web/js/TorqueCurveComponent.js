@@ -148,7 +148,7 @@ class TorqueCurveComponent extends BaseComponent{
                     this.maxTorqueLine.attr('y1',torqueY).attr('y2',torqueY);
             
             
-                    const powerY = 0.1 * this.height() + this.height() * this.torque.getMax() / maxAxis * 0.8;
+                    const powerY = 0.1 * this.height() + this.height() * this.power.getMax() / maxAxis * 0.8;
                     this.maxPowerText.attr('y',powerY).html(this.power.getMax().toFixed(0)+ "HP");
                     this.maxPowerLine.attr('y1',powerY).attr('y2',powerY);
                     
