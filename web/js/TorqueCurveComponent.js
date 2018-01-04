@@ -113,7 +113,7 @@ class TorqueCurveComponent extends BaseComponent{
        
         const t = data.sEngineTorque;
         const p = t * data.sRpm * (1/60) * 2 * Math.PI * 1e-3 * 1.32;
-        const b = 2 * (data.sTurboBoostPressure /100000) - 2; //convert to bar
+        const b =  (data.sTurboBoostPressure /100000) - 1; //convert to bar
         const pChanged = this.power.update(data.sRpm,p);
         const tChanged = this.torque.update(data.sRpm,t);
         const bChanged = this.boost.update(data.sRpm,b);
