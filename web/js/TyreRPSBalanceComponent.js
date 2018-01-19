@@ -42,14 +42,18 @@ class TyreRPSBalanceComponent extends BaseComponent{
         this.heightDataset.forEach(function(d){d.update(height)});
         let points = [];
 
+
+        const safeRemap = (x) => {return Math.sign(x) * Math.abs(x) / (Math.abs(x) + 1)}
+        const rpsRescale = (x,a,b) => {return safeRemap(x * (a+b)/4)};
+
         this.rpsDataset.forEach(function(d,i){
-            points.push(this.getInterpolatedTyrePosition(d.getData(),0,1,{x:0,y:(i +1) * this.factorOffset},{color:'red'}));
-            points.push(this.getInterpolatedTyrePosition(d.getData(),2,3,{x:0,y:-(i+1) * this.factorOffset},{color:'red'}));
-            points.push(this.getInterpolatedTyrePosition(d.getData(),0,2,{y:0,x:(i+1) * this.factorOffset},{color:'red'}));
-            points.push(this.getInterpolatedTyrePosition(d.getData(),1,3,{y:0,x:-(i+1) * this.factorOffset},{color:'red'}));
+            points.push(this.getInterpolatedTyrePosition(d.getData(),0,1,{x:0,y:(i +1) * this.factorOffset},{color:'red'},rpsRescale));
+            points.push(this.getInterpolatedTyrePosition(d.getData(),2,3,{x:0,y:-(i+1) * this.factorOffset},{color:'red',rpsRescale}));
+            points.push(this.getInterpolatedTyrePosition(d.getData(),0,2,{y:0,x:(i+1) * this.factorOffset},{color:'red'},rpsRescale));
+            points.push(this.getInterpolatedTyrePosition(d.getData(),1,3,{y:0,x:-(i+1) * this.factorOffset},{color:'red'},rpsRescale));
         }.bind(this));
         
-        
+
         this.heightDataset.forEach(function(d,i){
             points.push(this.getInterpolatedTyrePosition(d.getData(),0,1,{x:0,y:-(i +1) * this.factorOffset},{color:'blue'}));
             points.push(this.getInterpolatedTyrePosition(d.getData(),2,3,{x:0,y:(i+1) * this.factorOffset},{color:'blue'}));
@@ -76,12 +80,16 @@ class TyreRPSBalanceComponent extends BaseComponent{
         .attr('fill',function(d){return d.additional.color}).attr('r',10);
     }
 
-    getInterpolatedTyrePosition(tyreData,indexone,indextwo,offset,additional){
+    getInterpolatedTyrePosition(tyreData,indexone,indextwo,offset,additional,renorm){
+        const renormFN = renorm? renorm: (x,a,b) => {return x};
         const rps = tyreData
         const oset = offset || {x:0,y:0};
         const arps = rps[indexone];
         const brps = rps[indextwo];
-        const ratio = (brps / (arps + brps)) || 0;
+        const initialRatio = 1- Math.max(Math.min( (brps / (arps + brps)) || 0,1),0); //ratio in range[0,1]
+        const symmetricRatio = initialRatio * 2.0 - 1.0; //ratio in range [-1,1]
+        const renormedRatio = renormFN(symmetricRatio,arps,brps);
+        const ratio = Math.max( Math.min((renormedRatio + 1.0) / 2.0,1),0);
         const apos = this.tyrePositions[indexone];
         const a = apos;
         const bpos = this.tyrePositions[indextwo];
