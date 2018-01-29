@@ -10,9 +10,9 @@ export default class GearComponent extends BaseComponent{
 
     OnReset():void{
         this.text = this.svg.append('text');
-        const size = Math.min(this.width(),this.height() / 2) * 0.8;
+        
         this.text
-            .attr('font-size',size)
+            .attr('font-size',100)
             .attr('y','100%');
           
     }
