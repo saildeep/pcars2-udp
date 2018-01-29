@@ -1,15 +1,17 @@
 class BaseComponent{
-    constructor(socket,div){
-        if(!socket)
-            throw new Error("No socket given");
+    
+    _height:number;
+    _width:number;
+    div:any;
+    svg:any;
 
+    constructor(div:any){
+      
         if(!div)
             throw new Error("No div given");
 
 
         
-
-        this.socket = socket;
         this._height = 0;
         this._width = 0;
         this.div = div;
@@ -33,16 +35,14 @@ class BaseComponent{
         this._width = this.div.node().getBoundingClientRect().width;
     }
 
-    width(){
+    width():number{
         return this._width;
     }
     
-    height(){
+    height():number{
         return this._height;
     }
 
     
 
 }
-
-module.exports = exports = BaseComponent;

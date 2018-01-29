@@ -8,7 +8,7 @@ module.exports = {
   context: __dirname,
   devtool: debug ? "inline-sourcemap" : null,
   entry: {
-        script:"./js/base.js",
+        script:"./js/base.ts",
     },
   output: {
     path: __dirname + "/js",
