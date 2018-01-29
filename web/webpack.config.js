@@ -26,9 +26,14 @@ module.exports = {
     new webpack.optimize.UglifyJsPlugin({ mangle: false, sourcemap: false }),
   ]),*/
 
+  resolve: {
+    // Add '.ts' and '.tsx' as a resolvable extension.
+    extensions: [ ".webpack.js", ".web.js", ".ts", ".tsx", ".js"]
+  },
   module: {
     loaders: [
       {test: /\.js$/, include: __dirname+ '/js',loader: 'babel-loader', query: {presets: ["es2015"],}},
+      { test: /\.tsx?$/, loader: "ts-loader" },
       { test: /\.less$/, exclude: /node_modules/, loader: ExtractTextPlugin.extract("css-loader!less-loader") }
 
       

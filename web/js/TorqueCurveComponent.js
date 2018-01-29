@@ -8,6 +8,9 @@ class TorqueCurveComponent extends BaseComponent{
     constructor(socket,div){
         super(socket,div);
         socket.on('sTelemetryData_raw',this.update.bind(this));
+        this.colorTorque = "red";
+        this.colorPower = "blue";
+        this.colorBoost = "lightgreen";
     }
 
     OnReset(){
@@ -28,7 +31,7 @@ class TorqueCurveComponent extends BaseComponent{
         .append('line')
         .attr('y1',0.1*this.height())
         .attr('y2',0.9*this.height())
-        .attr('stroke','#04080F')
+        .attr('stroke','aqua')
         .attr('x1',0.1*this.width())
         .attr('x2',0.9*this.width())
         .attr('stroke-width',5)
