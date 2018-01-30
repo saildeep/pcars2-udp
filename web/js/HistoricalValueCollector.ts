@@ -43,10 +43,11 @@ export default abstract class HistoricalValueCollector<State> extends BaseValueC
     getTimeNormalized():TimedEntry<State>[]{
         if(!this.hasData())
             return null;
-        const tmin:number = this.getState()[0].t;
+        const tmax:number = this.getState()[this.getState().length-1].t;
         
-        return this.getState().map(function(te:TimedEntry<State>){
-            return new TimedEntry<State>(te.e, (te.t - tmin) / this.keepMs);
+        return this.getState().map(function(te:TimedEntry<State>,index:number){
+            const normalizedTime = (te.t - (tmax - this.keepMs))/this.keepMs;
+            return new TimedEntry<State>(te.e,index == 0? 0 :normalizedTime );
         }.bind(this));
     }
 

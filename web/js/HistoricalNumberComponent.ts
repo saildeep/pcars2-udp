@@ -25,16 +25,18 @@ export default class HistoricalNumberComponent extends BaseComponent{
         const subDataSelection = this.bindData(allDataSelection,function(d:HistoricalNumberComponentConfig){
             const timedData = d.data.getTimeNormalized();
             if(!timedData)
-                return ["M0 0 Z"];
-            return ["M " + (this.width() * 0.1) + " " + (this.height() *0.9) + " "  + timedData.map(function(td:TimedEntry<number>,i:number):string{
+                return [];
+            const p:string ="M " + (this.width() * 0.1) + " " + (this.height() *0.9) + " "  + timedData.map(function(td:TimedEntry<number>,i:number):string{
                 const y = (0.9 -  0.8* (td.e - d.data.minV) / (d.data.maxV - d.data.minV + 0.00001)) * this.height();
                 const x = (td.t * 0.8 + 0.1) * this.width();
                 return ('L' + x.toString() + " " + y.toString() + " ");
-            }.bind(this)).reduce(function(pre:string,next:string):string{return pre + next}) + "L" +(this.width() * 0.9) + " " + (this.height() * 0.9)+ " Z"];
+            }.bind(this)).reduce(function(pre:string,next:string):string{return pre + next}) + "L" +(this.width() * 0.9) + " " + (this.height() * 0.9)+ " Z";
+            return [{path:p,config:d}];
         }.bind(this),'path')
         subDataSelection
-        .attr('d',function(d:string){return d})
-        .attr('fill','aqua')
+        .attr('d',function(d:any){return d.path})
+        .attr('fill',function(d:any){return d.config.fill})
+        .attr('stroke',function(d:any){return d.config.stroke})
         ;
         
     }
@@ -56,13 +58,15 @@ export default class HistoricalNumberComponent extends BaseComponent{
    
 }
 export class HistoricalNumberComponentConfig{
-    public color:string;
+    public fill:string;
+    public stroke:string;
     public unit:string;
     public useZeroNorm:boolean;
     public data:HistoricNumberCollector;
-    constructor(data:HistoricNumberCollector, color:string='aqua',unit:string='',useZeroNorm:boolean = true){
+    constructor(data:HistoricNumberCollector, fill:string='#0000',stroke:string='aqua',unit:string='',useZeroNorm:boolean = true){
         this.data = data;
-        this.color = color;
+        this.fill = fill;
+        this.stroke = stroke;
         this.unit = unit;
         this.useZeroNorm = useZeroNorm;
     }
