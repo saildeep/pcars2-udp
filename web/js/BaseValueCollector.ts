@@ -8,11 +8,18 @@ export default abstract class BaseValueCollector<State> extends EventEmitter{
         super();
         this.socket = socket;
         this.socket.on('sTelemetryData_raw',this.updateTelemetry.bind(this));
+        this.socket.on('sRaceData_raw',this.updateRaceData.bind(this));
         this.socket.on('statistics',this.updateTelemetry.bind(this));
     }
 
-    abstract updateTelemetry(telemetryData:any):void;
-    abstract updateStatistics(telemetryData:any):void;
+    reset():void{
+        this.setState(this.defaultState());
+    }
+
+    abstract defaultState():State;
+    updateTelemetry(telemetryData:any):void{}
+    updateStatistics(statistics:any):void{}
+    updateRaceData(raceData:any):void{}
     protected setState(state:State){
         this.state = state;
         this.emit('update',state);

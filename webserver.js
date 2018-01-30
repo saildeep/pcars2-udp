@@ -34,6 +34,11 @@ parser.on('sTelemetryData_raw',(data)=>{
     io.sockets.emit('sTelemetryData_raw',data);
 });
 
+parser.on('sRaceData_raw',(data)=>{
+    //console.log("Sending telemetry data");
+    io.sockets.emit('sRaceData_raw',data);
+});
+
 parser.on('statistics',(data)=>{
     io.sockets.emit('statistics',data);
 });
