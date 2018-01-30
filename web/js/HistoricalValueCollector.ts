@@ -18,7 +18,7 @@ export default abstract class HistoricalValueCollector<State> extends BaseValueC
         state.push(new TimedEntry<State>(e));
         this.setState(state);
     }
-    
+
 
     private removeObsolete():void{
         const now = Date.now();
@@ -31,14 +31,31 @@ export default abstract class HistoricalValueCollector<State> extends BaseValueC
         }
         
     }
+
+    /**
+     * Get all entries with the time normalized between 0 and 1, where 0 is the oldest entry
+     */
+    getTimeNormalized():TimedEntry<State>[]{
+        if(!this.hasData())
+            return null;
+        const tmin:number = this.getState()[0].t;
+        const tmax:number = this.getState()[this.getState().length -1].t;
+        return this.getState().map(function(te:TimedEntry<State>){
+            return new TimedEntry<State>(te.e, (te.t - tmin) / (0.0000001 + tmax - tmin));
+        });
+    }
+
+    hasData():boolean{
+        return this.getState().length > 2;
+    }
 }
 
 class TimedEntry<Element>{
     public e:Element;
     public t:number;
 
-    constructor(value:Element){
+    constructor(value:Element,t = Date.now()){
         this.e = value;
-        this.t = Date.now();
+        this.t = t;
     }
 }

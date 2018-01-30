@@ -6,6 +6,8 @@ import BaseComponent from './BaseComponent';
 import GearComponent from './GearComponent';
 import CurrentGearCollector from './CurrentGearCollector';
 import BaseValueCollector from './BaseValueCollector';
+import HistoricalRPMCollector from './HistoricalRPMCollector';
+import HistoricalNumberComponent from './HistoricalNumberComponent';
 const socket = io();
 
 let components:BaseComponent[] = [];
@@ -20,10 +22,13 @@ function resetAll(){
 }
 
 const gc:CurrentGearCollector = new CurrentGearCollector(socket);
+const rpmc:HistoricalRPMCollector = new HistoricalRPMCollector(socket,60);
 collectors.push(gc);
+collectors.push(rpmc);
 
 window.onload = function(){
     components.push(new GearComponent(d3.select('#gear'),gc));
+    components.push(new HistoricalNumberComponent(d3.select('#b'),rpmc));
 }
 
 

@@ -1,8 +1,8 @@
 import HistoricalValueCollector from "./HistoricalValueCollector";
 
-class HistoricNumberCollector extends HistoricalValueCollector<number>{
-    protected minV:number = Number.MAX_VALUE;
-    protected maxV:number = Number.MIN_VALUE;
+export default abstract class HistoricNumberCollector extends HistoricalValueCollector<number>{
+    public minV:number = Number.MAX_VALUE;
+    public maxV:number = Number.MIN_VALUE;
 
     add(e:number){
         super.add(e);
