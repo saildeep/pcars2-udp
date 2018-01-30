@@ -16,18 +16,20 @@ class Struct{
         let p = new Parser();
         
 
-        if(!nested)
-           // console.log("struct " + this.name + "{");
+        /*if(!nested)
+           console.log("struct " + this.name + "{");*/
         for(var varName in this.valueDict){
             const variable = this.valueDict[varName];
+            /*
             if(!nested)
-         //       console.log("    " + variable.varType + JSON.stringify(variable.arraySize) + "    " + variable.varName + ";     //" + p.sizeOf());
+                console.log("    " + variable.varType + JSON.stringify(variable.arraySize) + "    " + variable.varName + ";     //" + p.sizeOf());*/
             p = variable.appendToParser(p,otherStructs);
             if(!p)
                 throw new Error("Invalid parser returned " + p);
         }
+        /*
         if(!nested)
-           // console.log("};");
+            console.log("};");*/
         
         this.parser = p;
         return p;
