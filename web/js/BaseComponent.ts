@@ -26,7 +26,7 @@ export default abstract class BaseComponent{
     reset(){
         this.div.selectAll("*").remove();
         this.updateSize();
-        this.svg = this.div.append('svg').attr('height',this.height()).attr('width',this.width()).attr('viewBox','0 0 100 100');
+        this.svg = this.div.append('svg').attr('height',this.height()).attr('width',this.width());
         
         this.OnReset();
     }

@@ -3,10 +3,12 @@ import { stat } from "fs";
 
 export default abstract class HistoricalValueCollector<State> extends BaseValueCollector<TimedEntry<State>[]>{
     protected keepMs:number;
+    protected maxFrequencyMs:number;
 
-    constructor(socket:any,secondsToKeep:number = 60){
+    constructor(socket:any,secondsToKeep:number = 60,maxFrequencyS:number = 0.1){
         super(socket);
         this.keepMs = secondsToKeep * 1000;
+        this.maxFrequencyMs = maxFrequencyS * 1000;
     }
     defaultState():TimedEntry<State>[]{
         return [];
@@ -14,6 +16,9 @@ export default abstract class HistoricalValueCollector<State> extends BaseValueC
 
     protected add(e:State):void{
         this.removeObsolete();
+        if(this.getState().length > 0 && this.getState()[this.getState().length -1].t > Date.now() - this.maxFrequencyMs)
+            return;
+
         const state = this.getState();
         state.push(new TimedEntry<State>(e));
         this.setState(state);
@@ -39,10 +44,10 @@ export default abstract class HistoricalValueCollector<State> extends BaseValueC
         if(!this.hasData())
             return null;
         const tmin:number = this.getState()[0].t;
-        const tmax:number = this.getState()[this.getState().length -1].t;
+        
         return this.getState().map(function(te:TimedEntry<State>){
-            return new TimedEntry<State>(te.e, (te.t - tmin) / (0.0000001 + tmax - tmin));
-        });
+            return new TimedEntry<State>(te.e, (te.t - tmin) / this.keepMs);
+        }.bind(this));
     }
 
     hasData():boolean{
@@ -50,7 +55,7 @@ export default abstract class HistoricalValueCollector<State> extends BaseValueC
     }
 }
 
-class TimedEntry<Element>{
+export class TimedEntry<Element>{
     public e:Element;
     public t:number;
 
