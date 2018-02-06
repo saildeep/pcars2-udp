@@ -19,7 +19,9 @@ window.addEventListener('resize', function(event){
 });
 
 function resetAll(){
+    collectors.forEach((e)=>{e.reset()});
     components.forEach((e)=>{e.reset()});
+    
 }
 
 const gc:CurrentGearCollector = new CurrentGearCollector(socket);
