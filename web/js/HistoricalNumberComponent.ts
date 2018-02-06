@@ -8,12 +8,26 @@ export default class HistoricalNumberComponent extends BaseComponent{
     private upper :any;
     private lower: any;
     private dataContainer:any;
+    private maxUnitDict:{[key:string]:number};
+    private minUnitDict:{[key:string]:number};
 
     constructor(div:any,data:HistoricalNumberComponentConfig[]){
         super(div);
         if(!data)
             throw new Error('empty data');
         this.data = data;
+        this.maxUnitDict = {};
+        this.minUnitDict = {};
+        data.forEach(function(a:HistoricalNumberComponentConfig,i:number){
+            if(!(a.unit in this.maxUnitDict)){
+                this.maxUnitDict[a.unit] = a.data.maxV;
+            }
+            if(!(a.unit in this.minUnitDict)){
+                this.minUnitDict[a.unit] = a.data.minV;
+            }
+            this.minUnitDict[a.unit] = Math.min(this.minUnitDict[a.unit],a.data.minV);
+            this.maxUnitDict[a.unit] = Math.max(this.maxUnitDict[a.unit],a.data.maxV);
+        }.bind(this));
     }
 
     OnReset():void{
@@ -49,11 +63,15 @@ export default class HistoricalNumberComponent extends BaseComponent{
     }
 
     private norm(v:number,config:HistoricalNumberComponentConfig):number{
+
+        this.minUnitDict[config.unit] = Math.min(this.minUnitDict[config.unit],config.data.minV);
+        this.maxUnitDict[config.unit] = Math.max(this.maxUnitDict[config.unit],config.data.maxV);
+        
+        const minV :number = config.useZeroNorm? 0: this.minUnitDict[config.unit];
+        const maxV :number = this.maxUnitDict[config.unit];
         const eps:number = 0.00001;
-        if(config.useZeroNorm){
-            return v / Math.max(config.data.maxV,eps);
-        }
-        return (v - config.data.minV) / Math.max(config.data.maxV - config.data.minV,eps);
+        
+        return (v - minV) / Math.max(maxV - minV,eps);
     }
    
 }
