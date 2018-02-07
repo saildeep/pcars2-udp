@@ -35,12 +35,16 @@ collectors.push(...tyreRPS);
 window.onload = function(){
     components.push(new GearComponent(d3.select('#gear'),gc));
     components.push(new HistoricalNumberComponent(d3.select('#b'),[
-   //     new HistoricalNumberComponentConfig(rpmc,'Engine RPM','#0000','aqua','RPM',true),
-   //     new HistoricalNumberComponentConfig(torquec,'Torque','#0000','#EEE','NM',true),
         new HistoricalNumberComponentConfig(tyreRPS[1],'Tyre FL','#0000','#FA0','TyreRPS',false),
         new HistoricalNumberComponentConfig(tyreRPS[0],'Tyre FR','#0000','#F0A','TyreRPS',false),
         new HistoricalNumberComponentConfig(tyreRPS[3],'Tyre RL','#0000','#AF0','TyreRPS',false),
         new HistoricalNumberComponentConfig(tyreRPS[2],'Tyre RR','#0000','#0FA','TyreRPS',false),
+    ]));
+
+    components.push(new HistoricalNumberComponent(d3.select('#c'),[
+            new HistoricalNumberComponentConfig(rpmc,'Engine RPM','#0000','aqua','RPM',true),
+            new HistoricalNumberComponentConfig(torquec,'Torque','#0000','#EEE','NM',true)
+           
     ]));
 }
 
