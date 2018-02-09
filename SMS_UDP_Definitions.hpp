@@ -54,7 +54,7 @@ struct PacketBase
 #pragma pack(1)
 struct sTelemetryData
 {
-	static const unsigned int	sPacketSize = 538;
+	static const unsigned int	sPacketSize = 556;
 	PacketBase			sBase;														// 0 12
 																										// Participant info
 	signed char							sViewedParticipantIndex;					// 12 1
@@ -124,14 +124,11 @@ struct sTelemetryData
 																										//  HW state
 	unsigned int							sJoyPad0;													// 376 4
 	unsigned char							sDPad;														// 377 1
-	char									sTyreCompound[4][TYRE_NAME_LENGTH_MAX]; // 378 160
-
-
-	float	sTurboBoostPressure;	// 538 4
-	float	sFullPosition[3];	// 542 12 -- position of the viewed participant with full precision
-	unsigned char	sBrakeBias;	// 554 1 -- quantized brake bias
-
-};																									// 555	
+	char									sTyreCompound[4][TYRE_NAME_LENGTH_MAX]; 		// 378 160
+	float									sTurboBoostPressure;							// 538 4
+	float									sFullPosition[3];								// 542 12 -- position of the viewed participant with full precision
+	unsigned char							sBrakeBias;										// 554 1 -- quantized brake bias
+};																							// 556	
 #pragma pack(pop)
 
 #define PARTICIPANT_NAME_LENGTH_MAX										64
@@ -175,20 +172,20 @@ struct sRaceData
 //
 //	Frequency: Logarithmic decrease
 //	When it is sent: Counter resets on entering InRace state and again each  the participants change. 
-//	The sParticipantsChangedTimestamp represent last time the participants has changed andis  to be used to sync 
+//	The sParticipantsChangedTimestamp represent last time the participants has changed and is to be used to sync 
 //	this information with the rest of the participant related packets
 //
 *******************************************************************************************************************/
-#define UDP_STREAMER_PARTICIPANTS_HANDLER_VERSION		1
+#define UDP_STREAMER_PARTICIPANTS_HANDLER_VERSION		2
 struct sParticipantsData
 {
-	static const unsigned int	sPacketSize = 1040;
-	PacketBase					sBase;				
-	unsigned int				sParticipantsChangedTimestamp;
-	char						sName[PARTICIPANTS_PER_PACKET][PARTICIPANT_NAME_LENGTH_MAX];
-	unsigned int	sNationality[PARTICIPANTS_PER_PACKET];	//	1040 64 
-	unsigned short	sIndex[PARTICIPANTS_PER_PACKET];	// 1104 32 -- session unique index for MP races
-};
+	static const unsigned int	sPacketSize = 1136;
+	PacketBase					sBase;														//	0 	12
+	unsigned int				sParticipantsChangedTimestamp;								//	12	4
+	char						sName[PARTICIPANTS_PER_PACKET][PARTICIPANT_NAME_LENGTH_MAX];//	16	1024
+	unsigned int				sNationality[PARTICIPANTS_PER_PACKET];						//	1040 64 
+	unsigned short				sIndex[PARTICIPANTS_PER_PACKET];							//  1104 32 -- session unique index for MP races
+};																							//	1136
 
 /*******************************************************************************************************************
 //
@@ -208,20 +205,20 @@ struct sParticipantInfo
 	unsigned short							sCurrentLapDistance;							// 12 --
 	unsigned char							sRacePosition;									// 14 -- holds the race position, + top bit shows if the participant is active or not
 	unsigned char							sSector;										// 15 -- sector + extra precision bits for x/z position
-	unsigned char							sHighestFlag;									// 16 --
-	unsigned char							sPitModeSchedule;								// 17 --
+	unsigned char							sHighestFlag;									// 16 -- (enum 3 bits/enum 2 bits) Flag colour and reason
+	unsigned char							sPitModeSchedule;								// 17 -- (enum 3 bits/enum 2 bits) Pit mode and Pit schedule 
 	unsigned short							sCarIndex;										// 18 -- top bit shows if participant is (local or remote) human player or not
 	unsigned char							sRaceState;										// 20 -- race state flags + invalidated lap indication --
 	unsigned char							sCurrentLap;									// 21 -- 
 	float									sCurrentTime;									// 22 --
 	float									sCurrentSectorTime;								// 26 --
-
-	unsigned short	sMPParticipantIndex;	// 30 -- matching sIndex from sParticipantsData
-};																							// 30
+	unsigned short							sMPParticipantIndex;							// 30 --  matching sIndex from sParticipantsData
+	
+};																							// 32
 
 struct sTimingsData
 {
-	static const unsigned int						sPacketSize = 993;
+	static const unsigned int						sPacketSize = 1059;
 	PacketBase						sBase;													// 0 12
 	signed char						sNumParticipants;										// 12 --
 	unsigned int					sParticipantsChangedTimestamp;							// 13 -- 
@@ -229,10 +226,9 @@ struct sTimingsData
 	float							sSplitTimeAhead;										// 21 --
 	float							sSplitTimeBehind;										// 25 -- 
 	float							sSplitTime;												// 29 --
-	sParticipantInfo				sPartcipants[UDP_STREAMER_PARTICIPANTS_SUPPORTED];		// 33 960
-
-	unsigned short	sLocalParticipantIndex;	// 1057 -- identifies which of the MP participants is the local player
-};																							// 993
+	sParticipantInfo				sPartcipants[UDP_STREAMER_PARTICIPANTS_SUPPORTED];		// 33 1024
+	unsigned short					sLocalParticipantIndex;									// 1057 -- identifies which of the MP participants is the local player
+};																							// 1059
 #pragma pack(pop)	
 
 /*******************************************************************************************************************
@@ -254,7 +250,7 @@ struct sGameStateData
 	signed char												sAmbientTemperature;		//16
 	signed char												sTrackTemperature;			//17
 	unsigned char											sRainDensity;				//18
-	unsigned char											sSnowDensity;				//19
+	unsigned char											sSnowDensity;				//19 --  this will be non zero only in Snow season, in other seasons whatever is falling from the sky is reported as rain
 	signed char												sWindSpeed;					//20
 	signed char												sWindDirectionX;			//21
 	signed char												sWindDirectionY;			//22 padded to 24
@@ -270,7 +266,7 @@ struct sGameStateData
 //	When it is sent: In Race
 //
 *******************************************************************************************************************/
-#define UDP_STREAMER_TIME_STATS_HANDLER_VERSION						1 
+#define UDP_STREAMER_TIME_STATS_HANDLER_VERSION						2 
 struct sParticipantStatsInfo
 {
 	float							sFastestLapTime;								// 0
@@ -279,23 +275,23 @@ struct sParticipantStatsInfo
 	float							sFastestSector1Time;							// 11
 	float							sFastestSector2Time;							// 16
 	float							sFastestSector3Time;							// 20
-
-	unsigned int	sParticipantOnlineRep;	// 24 (u16 rank type + u16 strength, 0 in SP races)
-	unsigned short	sMPParticipantIndex;	// 28 -- matching sIndex from sParticipantsData
-};																					// 24
+	unsigned int					sParticipantOnlineRep;							// 24 (u16 rank type + u16 strength, 0 in SP races)
+	unsigned short					sMPParticipantIndex;							// 28 -- matching sIndex from sParticipantsData
+};																					// 32 -- padded to  32
+ 
 
 struct sParticipantsStats
 {
-	sParticipantStatsInfo	sParticipants[UDP_STREAMER_PARTICIPANTS_SUPPORTED]; //768
+	sParticipantStatsInfo	sParticipants[UDP_STREAMER_PARTICIPANTS_SUPPORTED]; //1024
 };
 
 struct sTimeStatsData
 {
-	static const unsigned int		sPacketSize = 784;
+	static const unsigned int		sPacketSize = 1024;
 	PacketBase						sBase;											// 0 12
 	unsigned int					sParticipantsChangedTimestamp;					// 12
-	sParticipantsStats				sStats;											// 16 + 768
-};																					// 784
+	sParticipantsStats				sStats;											// 16 + 1024
+};																					// 1040
 
 /*******************************************************************************************************************
 //
