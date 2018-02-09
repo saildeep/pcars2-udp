@@ -99,7 +99,9 @@ class PCars2UdpParser extends events.EventEmitter{
 
     pushBuffer(buffer){
         const base = this.parseBase(buffer);
-        if(base.mPacketVersion === 2){
+        //TODO add new definitions file
+        //there is something wrong with version since patch 4
+        if(true){
             const structName = this.packetIdToStruct[base.mPacketType];
             this.categoryStatistics[structName].push(base.mCategoryPacketNumber);
             //this.emit('statistics',this.categoryStatistics);
