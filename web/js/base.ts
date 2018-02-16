@@ -14,9 +14,16 @@ const socket = io();
 let components:BaseComponent[] = [];
 let collectors:BaseValueCollector<any>[] = [];
 
+
+let raceTrack:string = "";
 socket.on('sRaceData_raw',function(data:any){
-    console.log(data);
-})
+   
+    const newRT = data.sTrackLocation+ data.sTrackVariation;
+    if(raceTrack!= newRT){
+        raceTrack = newRT;
+        resetAll();
+    }
+});
 
 window.addEventListener('resize', function(event){
    resetAll();
