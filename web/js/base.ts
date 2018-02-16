@@ -14,6 +14,10 @@ const socket = io();
 let components:BaseComponent[] = [];
 let collectors:BaseValueCollector<any>[] = [];
 
+socket.on('sRaceData_raw',function(data:any){
+    console.log(data);
+})
+
 window.addEventListener('resize', function(event){
    resetAll();
 });
