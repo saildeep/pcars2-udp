@@ -8,7 +8,7 @@ import CurrentGearCollector from './CurrentGearCollector';
 import BaseValueCollector from './BaseValueCollector';
 
 import HistoricalNumberComponent, { HistoricalNumberComponentConfig } from './HistoricalNumberComponent';
-import { HistoricalRPMCollector, HistoricalTyreRPSCollector, HistoricalTorqueCollector, HistoricalTyreYCollector } from './HistoricalNumberCollectors';
+import { HistoricalRPMCollector, HistoricalTyreRPSCollector, HistoricalTorqueCollector, HistoricalTyreYCollector, HistoricalRPMByfilteredThrottleCollector, HistoricalRPMByUnfilteredThrottleCollector, HistoricalPowerCollector } from './HistoricalNumberCollectors';
 const socket = io();
 
 let components:BaseComponent[] = [];
@@ -34,16 +34,22 @@ function resetAll(){
     components.forEach((e)=>{e.reset()});
     
 }
-const keepSecs:number = 30;
+const keepSecs:number = 8;
 const freq:number = 0.01;
 const gc:CurrentGearCollector = new CurrentGearCollector(socket);
-const rpmc:HistoricalRPMCollector = new HistoricalRPMCollector(socket,keepSecs,freq);
+const rpmThrottleF:HistoricalRPMByfilteredThrottleCollector = new HistoricalRPMByfilteredThrottleCollector(socket,keepSecs,freq);
+const rpmThrottleUF:HistoricalRPMByUnfilteredThrottleCollector = new HistoricalRPMByUnfilteredThrottleCollector(socket,keepSecs,freq);
+const power:HistoricalPowerCollector = new HistoricalPowerCollector(socket,keepSecs,freq);
 const torquec:HistoricalRPMCollector = new HistoricalTorqueCollector(socket,keepSecs,freq);
 const tyreRPS:HistoricalTyreRPSCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalTyreRPSCollector(socket,keepSecs,freq,t);});
 const tyreY:HistoricalTyreYCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalTyreYCollector(socket,keepSecs,freq,t)})
 collectors.push(gc);
-collectors.push(rpmc);
+collectors.push(power);
+collectors.push(torquec);
+collectors.push(rpmThrottleF);
+collectors.push(rpmThrottleUF);
 collectors.push(...tyreRPS);
+collectors.push(...tyreY)
 
 window.onload = function(){
     components.push(new GearComponent(d3.select('#gear'),gc));
@@ -62,8 +68,10 @@ window.onload = function(){
     ]));
 
     components.push(new HistoricalNumberComponent(d3.select('#c'),[
-            new HistoricalNumberComponentConfig(rpmc,'Engine RPM','#0000','aqua','RPM',true),
-            new HistoricalNumberComponentConfig(torquec,'Torque','#0000','#EEE','NM',true)
+            new HistoricalNumberComponentConfig(rpmThrottleF,'Filtered Throotle *RPM','#0000','aqua','RPM',true),
+            new HistoricalNumberComponentConfig(rpmThrottleUF,'Uniltered Throotle *RPM','#0000','#42f477','RPM',true),
+            new HistoricalNumberComponentConfig(torquec,'Torque','#0000','#f44141','NM',true),
+            new HistoricalNumberComponentConfig(power,'Power','#0000','#e541f4','HP',true)
            
     ]));
 }

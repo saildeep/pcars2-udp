@@ -20,10 +20,25 @@ export class HistoricalRPMCollector extends HistoricNumberCollector{
         this.add(telemetry.sRpm);
     }
 }
+export class HistoricalRPMByUnfilteredThrottleCollector extends HistoricNumberCollector{
+    updateTelemetry(telemetry:any){
+        this.add(telemetry.sRpm * telemetry.sUnfilteredThrottle /255);
+    }
+}
+export class HistoricalRPMByfilteredThrottleCollector extends HistoricNumberCollector{
+    updateTelemetry(telemetry:any){
+        this.add(telemetry.sRpm * telemetry.sThrottle /255.0);
+    }
+}
 
 export class HistoricalTorqueCollector extends HistoricNumberCollector{
     updateTelemetry(telemetry:any){
         this.add(telemetry.sEngineTorque);
+    }
+}
+export class HistoricalPowerCollector extends HistoricNumberCollector{
+    updateTelemetry(telemetry:any){
+        this.add(telemetry.sEngineTorque *telemetry.sRpm /5252.0);
     }
 }
 
