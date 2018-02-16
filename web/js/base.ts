@@ -35,10 +35,10 @@ collectors.push(...tyreRPS);
 window.onload = function(){
     components.push(new GearComponent(d3.select('#gear'),gc));
     components.push(new HistoricalNumberComponent(d3.select('#b'),[
-        new HistoricalNumberComponentConfig(tyreRPS[1],'Tyre FL','#0000','#FA0','TyreRPS',false),
-        new HistoricalNumberComponentConfig(tyreRPS[0],'Tyre FR','#0000','#F0A','TyreRPS',false),
-        new HistoricalNumberComponentConfig(tyreRPS[3],'Tyre RL','#0000','#AF0','TyreRPS',false),
-        new HistoricalNumberComponentConfig(tyreRPS[2],'Tyre RR','#0000','#0FA','TyreRPS',false),
+        new HistoricalNumberComponentConfig(tyreRPS[0],'Tyre FL','#0000','#FA0','TyreRPS',false),
+        new HistoricalNumberComponentConfig(tyreRPS[1],'Tyre FR','#0000','#F0A','TyreRPS',false),
+        new HistoricalNumberComponentConfig(tyreRPS[2],'Tyre RL','#0000','#AF0','TyreRPS',false),
+        new HistoricalNumberComponentConfig(tyreRPS[3],'Tyre RR','#0000','#0FA','TyreRPS',false),
     ]));
 
     components.push(new HistoricalNumberComponent(d3.select('#c'),[
