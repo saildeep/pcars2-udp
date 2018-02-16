@@ -32,4 +32,9 @@ export class HistoricalTyreRPSCollector extends HistoricalTireDataCollector{
         this.add(-1 *telemetry.sTyreRPS[this.tire]);
     }
 }
+export class HistoricalTyreYCollector extends HistoricalTireDataCollector{
+    updateTelemetry(telemetry:any){
+        this.add(-100*telemetry.sWheelLocalPositionY[this.tire]);
+    }
+}
 

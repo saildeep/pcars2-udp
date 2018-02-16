@@ -8,7 +8,7 @@ import CurrentGearCollector from './CurrentGearCollector';
 import BaseValueCollector from './BaseValueCollector';
 
 import HistoricalNumberComponent, { HistoricalNumberComponentConfig } from './HistoricalNumberComponent';
-import { HistoricalRPMCollector, HistoricalTyreRPSCollector, HistoricalTorqueCollector } from './HistoricalNumberCollectors';
+import { HistoricalRPMCollector, HistoricalTyreRPSCollector, HistoricalTorqueCollector, HistoricalTyreYCollector } from './HistoricalNumberCollectors';
 const socket = io();
 
 let components:BaseComponent[] = [];
@@ -34,11 +34,13 @@ function resetAll(){
     components.forEach((e)=>{e.reset()});
     
 }
-
+const keepSecs:number = 30;
+const freq:number = 0.01;
 const gc:CurrentGearCollector = new CurrentGearCollector(socket);
-const rpmc:HistoricalRPMCollector = new HistoricalRPMCollector(socket,10);
-const torquec:HistoricalRPMCollector = new HistoricalTorqueCollector(socket,10);
-const tyreRPS:HistoricalTyreRPSCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalTyreRPSCollector(socket,10,0.1,t);});
+const rpmc:HistoricalRPMCollector = new HistoricalRPMCollector(socket,keepSecs,freq);
+const torquec:HistoricalRPMCollector = new HistoricalTorqueCollector(socket,keepSecs,freq);
+const tyreRPS:HistoricalTyreRPSCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalTyreRPSCollector(socket,keepSecs,freq,t);});
+const tyreY:HistoricalTyreYCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalTyreYCollector(socket,keepSecs,freq,t)})
 collectors.push(gc);
 collectors.push(rpmc);
 collectors.push(...tyreRPS);
@@ -50,6 +52,13 @@ window.onload = function(){
         new HistoricalNumberComponentConfig(tyreRPS[1],'Tyre FR','#0000','#F0A','TyreRPS',false),
         new HistoricalNumberComponentConfig(tyreRPS[2],'Tyre RL','#0000','#AF0','TyreRPS',false),
         new HistoricalNumberComponentConfig(tyreRPS[3],'Tyre RR','#0000','#0FA','TyreRPS',false),
+    ]));
+
+    components.push(new HistoricalNumberComponent(d3.select('#tr'),[
+        new HistoricalNumberComponentConfig(tyreY[0],'Susp FL','#0000','#FA0','cm',false),
+        new HistoricalNumberComponentConfig(tyreY[1],'Susp FR','#0000','#F0A','cm',false),
+        new HistoricalNumberComponentConfig(tyreY[2],'Susp RL','#0000','#AF0','cm',false),
+        new HistoricalNumberComponentConfig(tyreY[3],'Susp RR','#0000','#0FA','cm',false),
     ]));
 
     components.push(new HistoricalNumberComponent(d3.select('#c'),[
