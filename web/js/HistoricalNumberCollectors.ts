@@ -53,3 +53,9 @@ export class HistoricalTyreYCollector extends HistoricalTireDataCollector{
     }
 }
 
+export class HistoricalTyreTempCollector extends HistoricalTireDataCollector{
+    updateTelemetry(telemetry:any){
+        this.add(telemetry.sTyreTempCenter[this.tire]);
+    }
+}
+
