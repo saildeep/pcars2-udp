@@ -2,8 +2,9 @@ import HistoricNumberCollector from "./HistoricNumberCollector";
 
 abstract class HistoricalTireDataCollector extends HistoricNumberCollector{
     protected tire:number;
+    protected smoothingFactor:number;
 
-    constructor(socket:any,secondsToKeep:number,maxFreq:number,tireIndex:number){
+    constructor(socket:any,secondsToKeep:number,maxFreq:number,tireIndex:number,exponentialSmoothingFactor:number = 0){
         super(socket,secondsToKeep,maxFreq)
         if(tireIndex<0){
             throw new Error("Invalid tire index");
@@ -11,8 +12,26 @@ abstract class HistoricalTireDataCollector extends HistoricNumberCollector{
         if(tireIndex > 3){
             throw new Error("Invalid tire index");
         }
+        if(exponentialSmoothingFactor<0 ||exponentialSmoothingFactor > 1){
+            throw new Error("Smoothing factor has to be in range from 0 to 1");
+        }
         this.tire = tireIndex;
+        this.smoothingFactor =exponentialSmoothingFactor;
     }
+    add(e:number){
+        
+        if(this.smoothingFactor>0){
+           
+            const newest = this.getNewest();
+            if(newest){
+                super.add(newest.e * this.smoothingFactor + (1- this.smoothingFactor) * e);
+                return;
+            }
+        }
+        super.add(e);
+    }
+
+
 }
 
 export class HistoricalRPMCollector extends HistoricNumberCollector{
@@ -54,6 +73,10 @@ export class HistoricalTyreYCollector extends HistoricalTireDataCollector{
 }
 
 export class HistoricalTyreTempCollector extends HistoricalTireDataCollector{
+    constructor(socket:any,secondsToKeep:number,maxFreq:number,tireIndex:number){
+        super(socket,secondsToKeep,maxFreq,tireIndex,0.75);
+    }
+
     updateTelemetry(telemetry:any){
         if(telemetry.sTyreTempCenter[this.tire] > 0){
             this.add(telemetry.sTyreTempCenter[this.tire]);

@@ -24,7 +24,6 @@ export default abstract class HistoricalValueCollector<State> extends BaseValueC
         this.setState(state);
     }
 
-
     private removeObsolete():void{
         const now = Date.now();
         const state = this.getState();
@@ -53,6 +52,15 @@ export default abstract class HistoricalValueCollector<State> extends BaseValueC
 
     hasData():boolean{
         return this.getState().length > 2;
+    }
+
+    getNewest():TimedEntry<State>{
+        const state = this.getState();
+        if(state.length > 0){
+            return state[state.length-1];
+        }else{
+            return undefined;
+        }
     }
 }
 
