@@ -27,12 +27,13 @@ export default abstract class HistoricalValueCollector<State> extends BaseValueC
     private removeObsolete():void{
         const now = Date.now();
         const state = this.getState();
-        if(state.length == 0)
-            return;
-        if(state[0].t < now - this.keepMs){
+        let changed = false;
+        while(state.length > 0 && state[0].t < now - this.keepMs){
             state.shift();
-            this.setState(state);
+            changed = true;
         }
+        if(changed)
+            this.setState(state);
         
     }
 
