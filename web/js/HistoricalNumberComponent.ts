@@ -11,6 +11,7 @@ export default class HistoricalNumberComponent extends BaseComponent{
     private minLabelContainer:any;
     private maxLabelContainer:any;
     private nameLabelContainer:any;
+    private currentLabelContainer:any;
     private maxUnitDict:{[key:string]:number};
     private minUnitDict:{[key:string]:number};
 
@@ -43,6 +44,7 @@ export default class HistoricalNumberComponent extends BaseComponent{
        this.minLabelContainer = this.svg.append('g');
        this.maxLabelContainer = this.svg.append('g');
        this.nameLabelContainer = this.svg.append('g');
+       this.currentLabelContainer = this.svg.append('g');
        this.minUnitDict = null;
        this.maxUnitDict = null;
     }
@@ -92,7 +94,17 @@ export default class HistoricalNumberComponent extends BaseComponent{
             .style('fill',function(d:HistoricalNumberComponentConfig,i:number){return d.stroke }.bind(this))
             .html(function(d:HistoricalNumberComponentConfig,i:number){return d.name}.bind(this));
        
-     
+        
+        this.bindData(this.currentLabelContainer,this.data,'text')
+            .attr('x',0.01 * this.width())
+            .attr('y',function(d:HistoricalNumberComponentConfig,i:number){return (1+ i) * xstep * this.height()}.bind(this))
+            .style('fill',function(d:HistoricalNumberComponentConfig,i:number){return d.stroke }.bind(this))
+            .html(function(d:HistoricalNumberComponentConfig,i:number){
+                if(d.data.getNewest()){
+                    return d.data.getNewest().e.toFixed(1) + "" + d.unit;
+                }
+                return "";
+            }.bind(this));
 
         
     }

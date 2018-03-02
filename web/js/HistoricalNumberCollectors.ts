@@ -78,8 +78,9 @@ export class HistoricalTyreTempCollector extends HistoricalTireDataCollector{
     }
 
     updateTelemetry(telemetry:any){
-        if(telemetry.sTyreTempCenter[this.tire] > 0){
-            this.add(telemetry.sTyreTempCenter[this.tire]);
+        const v = telemetry.sTyreTempCenter[this.tire];
+        if(v > 0){
+            this.add(v);
         }
     }
 }
