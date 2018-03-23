@@ -71,12 +71,12 @@ export class HistoricalDeltaTyreRPSCollector extends HistoricalTireDataCollector
     updateTelemetry(telemetry:any){
         const tyreSum = telemetry.sTyreRPS.reduce((accumulator:number, currentValue:number) => accumulator + currentValue);
         const tyreAVG = tyreSum * 0.25;
-        this.add( (-1 * tyreAVG) - (-1 *telemetry.sTyreRPS[this.tire]));
+        this.add( -1 * (-1 * tyreAVG) - (-1 *telemetry.sTyreRPS[this.tire]));
     }
 }
 export class HistoricalTyreYCollector extends HistoricalTireDataCollector{
     updateTelemetry(telemetry:any){
-        this.add(100 * telemetry.sWheelLocalPositionY[this.tire]);
+        this.add(-100 * (/* telemetry.sTyreY[this.tire]  - */telemetry.sWheelLocalPositionY[this.tire] ) );
     }
 }
 

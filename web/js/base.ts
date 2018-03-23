@@ -9,6 +9,7 @@ import BaseValueCollector from './BaseValueCollector';
 
 import HistoricalNumberComponent, { HistoricalNumberComponentConfig } from './HistoricalNumberComponent';
 import { HistoricalRPMCollector, HistoricalDeltaTyreRPSCollector, HistoricalTorqueCollector, HistoricalTyreYCollector, HistoricalRPMByfilteredThrottleCollector, HistoricalRPMByUnfilteredThrottleCollector, HistoricalPowerCollector, HistoricalTyreTempCollector } from './HistoricalNumberCollectors';
+import { CurrentBoostCollector } from './BaseValueCollectors';
 const socket = io();
 
 let components:BaseComponent[] = [];
@@ -37,6 +38,7 @@ function resetAll(){
 const keepSecs:number = 8;
 const freq:number = 0.01;
 const gc:CurrentGearCollector = new CurrentGearCollector(socket);
+const bc:CurrentBoostCollector = new CurrentBoostCollector(socket);
 const rpmThrottleF:HistoricalRPMByfilteredThrottleCollector = new HistoricalRPMByfilteredThrottleCollector(socket,keepSecs,freq);
 const rpmThrottleUF:HistoricalRPMByUnfilteredThrottleCollector = new HistoricalRPMByUnfilteredThrottleCollector(socket,keepSecs,freq);
 const power:HistoricalPowerCollector = new HistoricalPowerCollector(socket,keepSecs,freq);
@@ -45,6 +47,7 @@ const tyreRPS:HistoricalDeltaTyreRPSCollector[] = [0,1,2,3].map(function(t:numbe
 const tyreY:HistoricalTyreYCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalTyreYCollector(socket,keepSecs,freq,t)});
 const tyreT:HistoricalTyreTempCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalTyreTempCollector(socket,keepSecs,freq,t)});
 collectors.push(gc);
+collectors.push(bc);
 collectors.push(power);
 collectors.push(torquec);
 collectors.push(rpmThrottleF);
@@ -54,7 +57,7 @@ collectors.push(...tyreY);
 collectors.push(...tyreT);
 
 window.onload = function(){
-    components.push(new GearComponent(d3.select('#gear'),gc));
+    components.push(new GearComponent(d3.select('#gear'),gc,bc));
     components.push(new HistoricalNumberComponent(d3.select('#b'),[
         new HistoricalNumberComponentConfig(tyreRPS[0],'Tyre FL','#0000','#FA0','RPS',false),
         new HistoricalNumberComponentConfig(tyreRPS[1],'Tyre FR','#0000','#F0A','RPS',false),
