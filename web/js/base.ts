@@ -8,7 +8,7 @@ import CurrentGearCollector from './CurrentGearCollector';
 import BaseValueCollector from './BaseValueCollector';
 
 import HistoricalNumberComponent, { HistoricalNumberComponentConfig } from './HistoricalNumberComponent';
-import { HistoricalRPMCollector, HistoricalTyreRPSCollector, HistoricalTorqueCollector, HistoricalTyreYCollector, HistoricalRPMByfilteredThrottleCollector, HistoricalRPMByUnfilteredThrottleCollector, HistoricalPowerCollector, HistoricalTyreTempCollector } from './HistoricalNumberCollectors';
+import { HistoricalRPMCollector, HistoricalDeltaTyreRPSCollector, HistoricalTorqueCollector, HistoricalTyreYCollector, HistoricalRPMByfilteredThrottleCollector, HistoricalRPMByUnfilteredThrottleCollector, HistoricalPowerCollector, HistoricalTyreTempCollector } from './HistoricalNumberCollectors';
 const socket = io();
 
 let components:BaseComponent[] = [];
@@ -41,7 +41,7 @@ const rpmThrottleF:HistoricalRPMByfilteredThrottleCollector = new HistoricalRPMB
 const rpmThrottleUF:HistoricalRPMByUnfilteredThrottleCollector = new HistoricalRPMByUnfilteredThrottleCollector(socket,keepSecs,freq);
 const power:HistoricalPowerCollector = new HistoricalPowerCollector(socket,keepSecs,freq);
 const torquec:HistoricalRPMCollector = new HistoricalTorqueCollector(socket,keepSecs,freq);
-const tyreRPS:HistoricalTyreRPSCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalTyreRPSCollector(socket,keepSecs,freq,t);});
+const tyreRPS:HistoricalDeltaTyreRPSCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalDeltaTyreRPSCollector(socket,keepSecs,freq,t);});
 const tyreY:HistoricalTyreYCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalTyreYCollector(socket,keepSecs,freq,t)});
 const tyreT:HistoricalTyreTempCollector[] = [0,1,2,3].map(function(t:number){return new HistoricalTyreTempCollector(socket,keepSecs,freq,t)});
 collectors.push(gc);
